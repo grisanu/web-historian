@@ -10,14 +10,15 @@ exports.headers = {
   'Content-Type': 'text/html'
 };
 
-exports.serveAssets = function(res, asset, callback) {
+
+exports.serveAssets = function(res, asset, reqMethod, callback) {
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
-
-  // check to see if asset being requested is a site url
-
   var filePath = archive.paths.siteAssets + asset;
+  if ( asset.includes('www') ) {
+    filePath = archive.paths.archivedSites + '/' + asset;
+  }
   fs.readFile(filePath, function(err, data) {
     var contentType = '';
     var ext = path.extname(filePath);
@@ -37,7 +38,11 @@ exports.serveAssets = function(res, asset, callback) {
       exports.headers['Content-Type'] = 'image/png';
       break;
     }
-    res.writeHead(200, exports.headers);
+    var statusCode = 200;
+    if ( reqMethod === 'POST' ) {
+      statusCode = 302;
+    }
+    res.writeHead(statusCode, exports.headers);
     res.end(data);
   });
 };
@@ -45,3 +50,6 @@ exports.serveAssets = function(res, asset, callback) {
 
 
 // As you progress, keep thinking about what helper functions you can put here!
+// var callback = function(statusCode, headers) {
+
+// };

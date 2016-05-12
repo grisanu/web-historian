@@ -32,13 +32,18 @@ exports.readListOfUrls = function(cb) {
 };
 
 exports.isUrlInList = function(url, cb) {
+  // if ( url.includes('www') ) {
+  //   url = url.slice(4);
+  // }
   exports.readListOfUrls(function(list) {
     cb(_.contains(list, url));
   });
 };
 
 exports.addUrlToList = function(url, cb) {
-  url = '\n' + url;
+  // if ( url.includes('www') ) {
+  //   url = url.slice(4);
+  // }
   fs.appendFile(exports.paths.list, url, function(err) {
     cb();
   });
@@ -60,9 +65,10 @@ exports.downloadUrls = function(urlArray) {
   // loop through urlArray
     // append to a file, if it doesnt exist it will create it
   for (var urlIndex = 0; urlIndex < urlArray.length; urlIndex++) {
+    // use callback pattern to get the right url
     (function (url) {
       var urlPath = exports.paths.archivedSites + '/' + url;
-      fs.appendFile(urlPath, 'blah blah');
+      fs.appendFile(urlPath, url);
     })(urlArray[urlIndex]);
   }
 };
