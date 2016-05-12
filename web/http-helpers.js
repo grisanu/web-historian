@@ -16,13 +16,17 @@ exports.serveAssets = function(res, asset, reqMethod, callback) {
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
   var filePath = archive.paths.siteAssets + asset;
-  if ( asset.includes('www') ) {
+  if ( asset.includes('.com') ) {
     filePath = archive.paths.archivedSites + '/' + asset;
   }
   fs.readFile(filePath, function(err, data) {
     var statusCode = 200;
     if ( reqMethod === 'POST' ) {
       statusCode = 302;
+      var responseBody = {
+        body: data
+      };
+      // data = JSON.stringify(responseBody);
     }
     callback(statusCode, filePath, data, res);
   });
@@ -33,7 +37,9 @@ exports.sendRes = function(statusCode, filePath, data, res) {
   var contentType = '';
   var ext = path.extname(filePath);
   switch (ext) {
+  case '.com':
   case '.html':
+    exports.headers['Content-Type'] = 'text/html';
     break;
   case '.js':
     exports.headers['Content-Type'] = 'text/javascript';

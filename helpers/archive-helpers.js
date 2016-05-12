@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -45,7 +46,7 @@ exports.addUrlToList = function(url, cb) {
 
 exports.isUrlArchived = function(url, cb) {
   // check if a file exists in a folder
-  var urlPath = exports.paths.archivedSites + url;
+  var urlPath = exports.paths.archivedSites + '/' + url;
   fs.readFile(urlPath, 'utf8', function(err, data) {
     if (err) {
       cb(false);
@@ -55,17 +56,33 @@ exports.isUrlArchived = function(url, cb) {
   });
 };
 
+var makeHttpReq = function (url) {
+  var options = {
+    hostname: url, 
+    path: '/'
+  };
+  var body = '';
+  var req = http.request(options, function(res) {
+    res.on('data', function(chunk) {
+      body += chunk;
+    });
+    res.on('end', function() {
+      var urlPath = exports.paths.archivedSites + '/' + url;
+      fs.writeFile(urlPath, body);    
+    });
+  });
+  req.end();
+};
+
 exports.downloadUrls = function(urlArray) {
   // loop through urlArray
     // append to a file, if it doesnt exist it will create it
-  for (var urlIndex = 0; urlIndex < urlArray.length; urlIndex++) {
+  for (var urlIndex = 0; urlIndex < urlArray.length - 1; urlIndex++) {
     // use callback pattern to get the right url
-    (function (url) {
-      var urlPath = exports.paths.archivedSites + '/' + url;
-      fs.appendFile(urlPath, url);
-    })(urlArray[urlIndex]);
+    makeHttpReq(urlArray[urlIndex]);
   }
 };
+
 
 
 

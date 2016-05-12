@@ -6,26 +6,10 @@ var sendRes = httpHelpers.sendRes;
 
 exports.handleRequest = function (req, res) {
   if ( req.method === 'GET' ) {
-    if ( req.url === '/' ) {
-      console.log('THIS IS A FUCNTIO', sendRes);
+    if ( req.url === '/' || req.url === '/index.html' ) {
       var asset = '/index.html';
       httpHelpers.serveAssets(res, asset, req.method, sendRes);
-    } else if ( req.url.includes('www') ) {
-      var asset = req.url;
-      archive.isUrlArchived(asset, function(archiveExists) {
-        if ( archiveExists ) { // if in archive
-        // return page
-          asset = asset.slice(1);
-          httpHelpers.serveAssets(res, asset, req.method, sendRes);
-          
-        } else { // else not in archive
-          // return loading
-          asset = 'loading.html';
-          httpHelpers.serveAssets(res, asset, req.method, sendRes);
-        }
-      });
-
-    } else if ( req.url === '/styles.css' ) {
+    } else if ( req.url === '/styles.css' || req.url === '/app.js' ) {
       var asset = req.url;
       httpHelpers.serveAssets(res, asset, req.method, sendRes);
     } else {
@@ -40,12 +24,24 @@ exports.handleRequest = function (req, res) {
 
     req.on('end', function () {
       var asset = body.slice(4);
+      if ( body.includes('www') ) {
+        asset = asset.slice(4);
+      }
+
+      archive.isUrlArchived(asset, function(archiveExists) {
+        if ( archiveExists ) { // if in archive
+        // return page
+          httpHelpers.serveAssets(res, asset, req.method, sendRes);
+        }
+      });
+
       archive.isUrlInList(asset, function(urlExists) {
         if ( !urlExists ) { // if in list
           archive.addUrlToList(asset, function () {} );
-          httpHelpers.serveAssets(res, 'loading.html', req.method, sendRes);
+          httpHelpers.serveAssets(res, '/loading.html', req.method, sendRes);
         } 
       });
+
     });
 
   }
