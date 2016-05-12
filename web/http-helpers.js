@@ -20,36 +20,39 @@ exports.serveAssets = function(res, asset, reqMethod, callback) {
     filePath = archive.paths.archivedSites + '/' + asset;
   }
   fs.readFile(filePath, function(err, data) {
-    var contentType = '';
-    var ext = path.extname(filePath);
-    switch (ext) {
-    case '.html':
-      break;
-    case '.js':
-      exports.headers['Content-Type'] = 'text/javascript';
-      break;
-    case '.css':
-      exports.headers['Content-Type'] = 'text/css';
-      break;
-    case '.gif':
-      exports.headers['Content-Type'] = 'image/gif';
-      break;
-    case '.png':
-      exports.headers['Content-Type'] = 'image/png';
-      break;
-    }
     var statusCode = 200;
     if ( reqMethod === 'POST' ) {
       statusCode = 302;
     }
-    res.writeHead(statusCode, exports.headers);
-    res.end(data);
+    callback(statusCode, filePath, data, res);
   });
+};
+
+// As you progress, keep thinking about what helper functions you can put here!
+exports.sendRes = function(statusCode, filePath, data, res) {
+  var contentType = '';
+  var ext = path.extname(filePath);
+  switch (ext) {
+  case '.html':
+    break;
+  case '.js':
+    exports.headers['Content-Type'] = 'text/javascript';
+    break;
+  case '.css':
+    exports.headers['Content-Type'] = 'text/css';
+    break;
+  case '.gif':
+    exports.headers['Content-Type'] = 'image/gif';
+    break;
+  case '.png':
+    exports.headers['Content-Type'] = 'image/png';
+    break;
+  }
+  // write header
+  res.writeHead(statusCode, exports.headers);
+  // end response
+  res.end(data);
 };
 
 
 
-// As you progress, keep thinking about what helper functions you can put here!
-// var callback = function(statusCode, headers) {
-
-// };

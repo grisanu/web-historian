@@ -32,19 +32,13 @@ exports.readListOfUrls = function(cb) {
 };
 
 exports.isUrlInList = function(url, cb) {
-  // if ( url.includes('www') ) {
-  //   url = url.slice(4);
-  // }
   exports.readListOfUrls(function(list) {
     cb(_.contains(list, url));
   });
 };
 
 exports.addUrlToList = function(url, cb) {
-  // if ( url.includes('www') ) {
-  //   url = url.slice(4);
-  // }
-  fs.appendFile(exports.paths.list, url, function(err) {
+  fs.appendFile(exports.paths.list, (url + '\n'), function(err) {
     cb();
   });
 };
