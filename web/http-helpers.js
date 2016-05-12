@@ -14,6 +14,32 @@ exports.serveAssets = function(res, asset, callback) {
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
+
+  // check to see if asset being requested is a site url
+
+  var filePath = archive.paths.siteAssets + asset;
+  fs.readFile(filePath, function(err, data) {
+    var contentType = '';
+    var ext = path.extname(filePath);
+    switch (ext) {
+    case '.html':
+      break;
+    case '.js':
+      exports.headers['Content-Type'] = 'text/javascript';
+      break;
+    case '.css':
+      exports.headers['Content-Type'] = 'text/css';
+      break;
+    case '.gif':
+      exports.headers['Content-Type'] = 'image/gif';
+      break;
+    case '.png':
+      exports.headers['Content-Type'] = 'image/png';
+      break;
+    }
+    res.writeHead(200, exports.headers);
+    res.end(data);
+  });
 };
 
 

@@ -25,17 +25,51 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(cb) {
+  fs.readFile(exports.paths.list, 'utf8', function(err, data) {
+    cb(data.split('\n'));
+  });
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(url, cb) {
+  exports.readListOfUrls(function(list) {
+    cb(_.contains(list, url));
+  });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url, cb) {
+  url = '\n' + url;
+  fs.appendFile(exports.paths.list, url, function(err) {
+    cb();
+  });
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url, cb) {
+  // check if a file exists in a folder
+  var urlPath = exports.paths.archivedSites + url;
+  fs.readFile(urlPath, 'utf8', function(err, data) {
+    if (err) {
+      cb(false);
+    } else {
+      cb(true);
+    }
+  });
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(urlArray) {
+  // loop through urlArray
+    // append to a file, if it doesnt exist it will create it
+  for (var urlIndex = 0; urlIndex < urlArray.length; urlIndex++) {
+    (function (url) {
+      var urlPath = exports.paths.archivedSites + '/' + url;
+      fs.appendFile(urlPath, 'blah blah');
+    })(urlArray[urlIndex]);
+  }
 };
+
+
+
+
+
+
+
