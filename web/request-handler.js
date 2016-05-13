@@ -27,8 +27,33 @@ exports.handleRequest = function (req, res) {
       if ( body.includes('www') ) {
         asset = asset.slice(4);
       }
+      // Async Promise Func
+      // archive.isUrlArchivedAsync(asset)
+      //   .then(function(archiveExists) {
+      //     console.log('this is in the is archive condition');
+      //     if (archiveExists) {
+      //       console.log('it thinks its in the archive')
+      //       httpHelpers.serveAssets(res, asset, req.method, sendRes);
+      //     }
+      //   });
 
-      archive.isUrlArchived(asset, function(archiveExists) {
+      // archive.isUrlArchived(asset, function(archiveExists) {
+      //   if ( archiveExists ) { // if in archive
+      //   // return page
+      //     httpHelpers.serveAssets(res, asset, req.method, sendRes);
+      //   }
+      // });
+
+      // archive.isUrlInListAsync(asset)
+      //   .then(function(urlExists) {
+      //     if (!urlExists) {
+      //       console.log('url was not in the list');
+      //       archive.addUrlToList(asset, function () {} );
+      //       httpHelpers.serveAssets(res, '/loading.html', req.method, sendRes);
+      //     }
+      //   });
+
+      archive.isUrlArchived(asset, function(err, archiveExists) {
         if ( archiveExists ) { // if in archive
         // return page
           httpHelpers.serveAssets(res, asset, req.method, sendRes);

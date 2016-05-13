@@ -5,7 +5,11 @@ var archive = require('../helpers/archive-helpers');
 
 // read the list
 exports.updateArchives = function() {
-  archive.readListOfUrls( function(listArray) {
-    archive.downloadUrls(listArray);
-  });
+  archive.readListOfUrlsAsync()
+    .then(function(listArray) {
+      archive.downloadUrls(listArray);
+    })
+    .catch(function (err) {
+      throw new Error('There has been an error: ', err);
+    });
 };

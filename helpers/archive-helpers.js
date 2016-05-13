@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var http = require('http');
+var Promise = require('bluebird');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -28,9 +29,15 @@ exports.initialize = function(pathsObj) {
 
 exports.readListOfUrls = function(cb) {
   fs.readFile(exports.paths.list, 'utf8', function(err, data) {
-    cb(data.split('\n'));
+    if (err) {
+      cb(err); // reject has error then body (or nothing)
+    } else {
+      cb(err, data.split('\n')); // resolve must have result as 2nd param
+    }
   });
 };
+
+exports.readListOfUrlsAsync = Promise.promisify(exports.readListOfUrls);
 
 exports.isUrlInList = function(url, cb) {
   exports.readListOfUrls(function(list) {
@@ -38,23 +45,38 @@ exports.isUrlInList = function(url, cb) {
   });
 };
 
+exports.isUrlInListAsync = function (url) {
+  return exports.readListOfUrlsAsync()
+    .then(function(list) {
+      return _.contains(list, url);
+    });
+};
+
 exports.addUrlToList = function(url, cb) {
   fs.appendFile(exports.paths.list, (url + '\n'), function(err) {
-    cb();
+    if (err) {
+      cb(err);
+    } else {
+      cb();
+    }
   });
 };
+
+exports.addUrlToListAsync = Promise.promisify(exports.addUrlToList);
 
 exports.isUrlArchived = function(url, cb) {
   // check if a file exists in a folder
   var urlPath = exports.paths.archivedSites + '/' + url;
   fs.readFile(urlPath, 'utf8', function(err, data) {
     if (err) {
-      cb(false);
+      cb(err, false);
     } else {
-      cb(true);
+      cb(err, true);
     }
   });
 };
+
+exports.isUrlArchivedAsync = Promise.promisify(exports.isUrlArchived);
 
 var makeHttpReq = function (url) {
   var options = {
